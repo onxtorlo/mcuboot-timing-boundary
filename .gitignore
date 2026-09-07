@@ -1,0 +1,8 @@
+zephyrproject/
+.west/
+build/
+bin/
+*.o
+*.elf
+*.bin
+*.hex
