@@ -6,3 +6,4 @@ bin/
 *.elf
 *.bin
 *.hex
+.venv/
