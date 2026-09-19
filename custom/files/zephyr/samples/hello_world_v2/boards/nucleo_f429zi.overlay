@@ -1,0 +1,9 @@
+&clk_hse {
+    status = "disabled";
+};
+&clk_hsi {
+    status = "okay";
+};
+&pll {
+    clocks = <&clk_hsi>;
+};

@@ -1,0 +1,3 @@
+zephyr/samples/hello_world_v1
+zephyr/samples/hello_world_v2
+bootloader/mcuboot/boot/zephyr/boards/stm32f429i_disc1.overlay

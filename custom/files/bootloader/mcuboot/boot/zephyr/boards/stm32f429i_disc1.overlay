@@ -1,0 +1,37 @@
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		/* Bootloader 영역 (128 KB: Sector 0~4) */
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x00020000>;
+		};
+
+		/* 실행 이미지 영역 (768 KB: Sector 5~10, 128KB 섹터 6개) */
+		slot0_partition: partition@20000 {
+			label = "image-0";
+			reg = <0x00020000 0x000c0000>;
+		};
+
+		/* 스왑용 스크래치 영역 (128 KB: Sector 11) */
+		scratch_partition: partition@e0000 {
+			label = "image-scratch";
+			reg = <0x000e0000 0x00020000>;
+		};
+
+		/* 저장소/보존 영역 (128 KB: Sector 12~16) */
+		storage_partition: partition@100000 {
+			label = "storage";
+			reg = <0x00100000 0x00020000>;
+		};
+
+		/* FOTA 다운로드 영역 (768 KB: Sector 17~22, 128KB 섹터 6개) */
+		slot1_partition: partition@120000 {
+			label = "image-1";
+			reg = <0x00120000 0x000c0000>;
+		};
+	};
+};
