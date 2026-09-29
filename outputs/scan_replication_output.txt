@@ -1,0 +1,55 @@
+=== 실험 1: 경계 이진탐색 시작 ===
+탐색 범위: 0x3c6f (FAST 확인됨) ~ 0xbfdff (SLOW 확인됨)
+참고 - 상단(용량) 경계 이론값(이번 탐색 대상 아님): 0xbffe0
+
+[step 1] 시도값=0x61d37 ... 404ms → SLOW
+[step 2] 시도값=0x32cd3 ... 254ms → SLOW
+[step 3] 시도값=0x1b4a1 ... 154ms → SLOW
+[step 4] 시도값=0xf888 ... 102ms → FAST
+[step 5] 시도값=0x15694 ... 153ms → SLOW
+
+  [!!!] step 5: vhci_hcd -104 버스트 감지 (최근 50줄 중 임계치 15 이상)
+  [!!!] Windows 쪽에서 아래 절차를 진행해 주세요:
+        1) usbipd detach --busid <ST-Link busid>
+        2) wsl --shutdown
+        3) wsl -e true   (distro 재기동)
+        4) usbipd attach --wsl --busid <ST-Link busid>
+  [!!!] 완료 후 이 터미널에서 Enter를 누르면 스캔을 계속합니다.
+  [체크포인트] 재개합니다.
+[step 6] 시도값=0x1278e ... 103ms → FAST
+[step 7] 시도값=0x13f11 ... 153ms → SLOW
+[step 8] 시도값=0x1334f ... 154ms → SLOW
+[step 9] 시도값=0x12d6e ... 152ms → SLOW
+[step 10] 시도값=0x12a7e ... 102ms → FAST
+
+  [!!!] step 10: vhci_hcd -104 버스트 감지 (최근 50줄 중 임계치 15 이상)
+  [!!!] Windows 쪽에서 아래 절차를 진행해 주세요:
+        1) usbipd detach --busid <ST-Link busid>
+        2) wsl --shutdown
+        3) wsl -e true   (distro 재기동)
+        4) usbipd attach --wsl --busid <ST-Link busid>
+  [!!!] 완료 후 이 터미널에서 Enter를 누르면 스캔을 계속합니다.
+  [체크포인트] 재개합니다.
+[step 11] 시도값=0x12bf6 ... 155ms → SLOW
+[step 12] 시도값=0x12b3a ... 103ms → FAST
+[step 13] 시도값=0x12b98 ... 154ms → SLOW
+[step 14] 시도값=0x12b69 ... 153ms → SLOW
+[step 15] 시도값=0x12b51 ... 102ms → FAST
+
+  [!!!] step 15: vhci_hcd -104 버스트 감지 (최근 50줄 중 임계치 15 이상)
+  [!!!] Windows 쪽에서 아래 절차를 진행해 주세요:
+        1) usbipd detach --busid <ST-Link busid>
+        2) wsl --shutdown
+        3) wsl -e true   (distro 재기동)
+        4) usbipd attach --wsl --busid <ST-Link busid>
+  [!!!] 완료 후 이 터미널에서 Enter를 누르면 스캔을 계속합니다.
+  [체크포인트] 재개합니다.
+[step 16] 시도값=0x12b5d ... 153ms → SLOW
+[step 17] 시도값=0x12b57 ... 155ms → SLOW
+[step 18] 시도값=0x12b54 ... 101ms → FAST
+[step 19] 시도값=0x12b55 ... 153ms → SLOW
+
+=== 결과 ===
+실측 경계: FAST 쪽 마지막 값=0x12b54, SLOW 쪽 첫 값=0x12b55
+(원본 유효 크기 0x3c6e 기준으로 이 값이 무엇을 의미하는지는 본문에서 분석 필요)
+상세 로그: boundary_scan_log.csv

@@ -1,0 +1,87 @@
+diff --git a/boot/bootutil/src/image_validate.c b/boot/bootutil/src/image_validate.c
+index 88cb1ef4..2ac2750e 100644
+--- a/boot/bootutil/src/image_validate.c
++++ b/boot/bootutil/src/image_validate.c
+@@ -56,6 +56,7 @@ BOOT_LOG_MODULE_DECLARE(mcuboot);
+ #endif
+ 
+ #include "bootutil_priv.h"
++#include <zephyr/kernel.h> /* DIAGNOSTIC INSTRUMENTATION: k_uptime_get_32 for timing analysis, remove after use */
+ 
+ /*
+  * Compute SHA hash over the image.
+@@ -428,8 +429,10 @@ bootutil_img_validate(struct boot_loader_state *state,
+     FIH_DECLARE(security_counter_valid, FIH_FAILURE);
+ #endif
+ 
++    BOOT_LOG_INF("TS_C_pre_hash %u", (unsigned int)k_uptime_get_32());
+     rc = bootutil_img_hash(state, hdr, fap, tmp_buf,
+             tmp_buf_sz, hash, seed, seed_len);
++    BOOT_LOG_INF("TS_D_post_hash %u rc=%d", (unsigned int)k_uptime_get_32(), rc);
+     if (rc) {
+         goto out;
+     }
+@@ -439,11 +442,14 @@ bootutil_img_validate(struct boot_loader_state *state,
+     }
+ 
+     rc = bootutil_tlv_iter_begin(&it, hdr, fap, IMAGE_TLV_ANY, false);
++    BOOT_LOG_INF("TS_F_post_tlvbegin %u rc=%d", (unsigned int)k_uptime_get_32(), rc);
+     if (rc) {
+         goto out;
+     }
+ 
+     if (it.tlv_end > bootutil_max_image_size(state, fap)) {
++        BOOT_LOG_INF("TS_G_maxsize_reject tlv_end=%u max=%u", (unsigned int)it.tlv_end,
++                     (unsigned int)bootutil_max_image_size(state, fap));
+         rc = -1;
+         goto out;
+     }
+@@ -615,6 +621,7 @@ bootutil_img_validate(struct boot_loader_state *state,
+ #endif
+ 
+ out:
++    BOOT_LOG_INF("TS_H_validate_out %u rc=%d", (unsigned int)k_uptime_get_32(), rc);
+     if (rc) {
+         FIH_SET(fih_rc, FIH_FAILURE);
+     }
+diff --git a/boot/bootutil/src/loader.c b/boot/bootutil/src/loader.c
+index 4a69b70f..ea370e7f 100644
+--- a/boot/bootutil/src/loader.c
++++ b/boot/bootutil/src/loader.c
+@@ -46,6 +46,7 @@
+ #include "bootutil/security_cnt.h"
+ #include "bootutil/boot_record.h"
+ #include "bootutil/fault_injection_hardening.h"
++#include <zephyr/kernel.h> /* DIAGNOSTIC INSTRUMENTATION: k_uptime_get_32 for timing analysis, remove after use */
+ #include "bootutil/ramload.h"
+ #include "bootutil/boot_hooks.h"
+ #include "bootutil/mcuboot_status.h"
+@@ -912,22 +913,28 @@ boot_validate_slot(struct boot_loader_state *state, int slot,
+         }
+     }
+ #endif
++    BOOT_LOG_INF("TS_A_pre_hdrvalid %u", (unsigned int)k_uptime_get_32());
+     if (!boot_is_header_valid(hdr, fap)) {
+         fih_rc = FIH_FAILURE;
+     } else {
++        BOOT_LOG_INF("TS_B_hdrvalid_ok %u", (unsigned int)k_uptime_get_32());
+         BOOT_HOOK_CALL_FIH(boot_image_check_hook, FIH_BOOT_HOOK_REGULAR,
+                            fih_rc, BOOT_CURR_IMG(state), slot);
+         if (FIH_EQ(fih_rc, FIH_BOOT_HOOK_REGULAR)) {
+             FIH_CALL(boot_image_check, fih_rc, state, hdr, fap, bs);
+         }
++        BOOT_LOG_INF("TS_E_imgcheck_done %u", (unsigned int)k_uptime_get_32());
+     }
+     if (FIH_NOT_EQ(fih_rc, FIH_SUCCESS)) {
++        BOOT_LOG_INF("TS_I_pre_erase_check %u erase_cond=%d", (unsigned int)k_uptime_get_32(),
++                     (int)((slot != BOOT_PRIMARY_SLOT) || ARE_SLOTS_EQUIVALENT()));
+         if ((slot != BOOT_PRIMARY_SLOT) || ARE_SLOTS_EQUIVALENT()) {
+             boot_erase_region(fap, 0, flash_area_get_size(fap), false);
+             /* Image is invalid, erase it to prevent further unnecessary
+              * attempts to validate and boot it.
+              */
+         }
++        BOOT_LOG_INF("TS_J_post_erase_check %u", (unsigned int)k_uptime_get_32());
+ #if !defined(__BOOTSIM__)
+         BOOT_LOG_ERR("Image in the %s slot is not valid!",
+                      (slot == BOOT_PRIMARY_SLOT) ? "primary" : "secondary");
