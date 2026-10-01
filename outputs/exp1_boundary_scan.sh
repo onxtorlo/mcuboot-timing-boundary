@@ -5,7 +5,14 @@
 # 결과: 콘솔 출력 + boundary_scan_log_<YYYYmmdd_HHMMSS>.csv (스크립트와 같은 폴더)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/common.sh"
+source "$SCRIPT_DIR/common.sh" || {
+  echo "[ERROR] common.sh를 불러오지 못함: $SCRIPT_DIR/common.sh" >&2
+  exit 1
+}
+if [ ! -f "$SLOT0_ORIG" ]; then
+  echo "[ERROR] 원본 이미지 없음: $SLOT0_ORIG" >&2
+  exit 1
+fi
 
 LOG_CSV="$SCRIPT_DIR/boundary_scan_log_$(date +%Y%m%d_%H%M%S).csv"
 echo "step,img_size_hex,elapsed_ms,classification" > "$LOG_CSV"
@@ -32,8 +39,10 @@ printf "참고 - 상단(용량) 경계 이론값(이번 탐색 대상 아님): 0
 echo
 
 ZOMBIE_CHECK_EVERY=5   # 매 N스텝마다 -104 버스트 체크
+MAX_CONSECUTIVE_FAILS=3   # 응답 없음/쓰기 실패가 연속 N회면 스캔 중단
 
 step=0
+fail_count=0
 low_dec=$((LOW))
 high_dec=$((HIGH))
 
@@ -57,12 +66,21 @@ while [ $((high_dec - low_dec)) -gt 1 ]; do
   case "$cls" in
     FAST)
       low_dec=$mid_dec   # 여전히 1단계 컷 → 경계는 더 위쪽
+      fail_count=0
       ;;
     SLOW)
       high_dec=$mid_dec  # 2단계까지 진입 → 경계는 더 아래쪽
+      fail_count=0
       ;;
-    NONE|WRITE_FAILED)
-      echo "  [WARN] 이번 시도 응답 없음/쓰기 실패, 재시도"
+    *)
+      # NONE / WRITE_FAILED / 예상하지 못한 출력
+      fail_count=$((fail_count+1))
+      echo "  [WARN] 응답 없음/쓰기 실패(${cls:-빈 결과}), 재시도 (${fail_count}/${MAX_CONSECUTIVE_FAILS})"
+      if [ "$fail_count" -ge "$MAX_CONSECUTIVE_FAILS" ]; then
+        echo "  [ERROR] 연속 ${MAX_CONSECUTIVE_FAILS}회 실패로 스캔 중단. 보드 연결과 /dev/ttyACM0 상태를 확인하세요." >&2
+        echo "  지금까지의 로그: $LOG_CSV" >&2
+        exit 1
+      fi
       step=$((step-1))
       ;;
   esac

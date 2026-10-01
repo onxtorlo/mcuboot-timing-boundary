@@ -9,7 +9,7 @@ SLOT0_ORIG="$OUTPUTS_DIR/slot0_orig.bin"
 SLOT0_TEST="$OUTPUTS_DIR/slot0_test.bin"
 FLASH_ADDR="0x08020000"
 IMG_SIZE_OFFSET=12          # +0x0C
-FAST_THRESHOLD_MS=150       # 이보다 빠르면 1단계 컷으로 판정 (B=17ms 기준)
+FAST_THRESHOLD_MS=150       # 이보다 빠르면 1단계 컷으로 판정 (재측정 B 약 53ms, C 약 650ms 사이)
 CAPTURE_TIMEOUT_S=3         # 응답 대기 최대 시간
 
 # ---- 시리얼 좀비 상태 자동 복구 -------------------------------------------
