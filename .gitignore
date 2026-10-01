@@ -5,5 +5,7 @@ bin/
 *.o
 *.elf
 *.bin
+!outputs/baseline_backup.bin
+!outputs/slot0_orig.bin
 *.hex
 .venv/
