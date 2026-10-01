@@ -1,11 +1,12 @@
 #!/bin/bash
 # common.sh — 공통 함수: 헤더 조작, 시리얼 복구, 타이밍 측정
-# source 해서 사용: source ./common.sh
+# source 해서 사용: source "$(dirname "${BASH_SOURCE[0]}")/common.sh"  (같은 폴더의 스크립트에서)
 
 set -uo pipefail
 
-SLOT0_ORIG="$HOME/secure_boot/slot0_orig.bin"
-SLOT0_TEST="$HOME/secure_boot/slot0_test.bin"
+OUTPUTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SLOT0_ORIG="$OUTPUTS_DIR/slot0_orig.bin"
+SLOT0_TEST="$OUTPUTS_DIR/slot0_test.bin"
 FLASH_ADDR="0x08020000"
 IMG_SIZE_OFFSET=12          # +0x0C
 FAST_THRESHOLD_MS=150       # 이보다 빠르면 1단계 컷으로 판정 (B=17ms 기준)

@@ -2,11 +2,12 @@
 # exp1_boundary_scan.sh — 실험 1: 1단계 컷(FAST) ↔ 2단계 진입(SLOW) 전이 지점을 이진탐색으로 특정
 #
 # 사용법: ./exp1_boundary_scan.sh
-# 결과: 콘솔 출력 + boundary_scan_log.csv
+# 결과: 콘솔 출력 + boundary_scan_log_<YYYYmmdd_HHMMSS>.csv (스크립트와 같은 폴더)
 
-source ./common.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
 
-LOG_CSV="boundary_scan_log.csv"
+LOG_CSV="$SCRIPT_DIR/boundary_scan_log_$(date +%Y%m%d_%H%M%S).csv"
 echo "step,img_size_hex,elapsed_ms,classification" > "$LOG_CSV"
 
 # 재보정 검증(2026-09-20, 각 값 2회 반복 재확인, 일관됨):

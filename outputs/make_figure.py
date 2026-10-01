@@ -1,11 +1,13 @@
 import csv
+import os
 import statistics as st
+from datetime import datetime
 from collections import defaultdict
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-B = "/home/onxtorlo/secure_boot/"
+B = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 
 def rows(name):
@@ -72,5 +74,6 @@ b.tick_params(labelsize=7)
 b.set_title("(b) The gap is kept only while T $\\leq$ d/2", fontsize=8)
 h, l = b.get_legend_handles_labels()
 fig.legend(h, l, loc="lower center", bbox_to_anchor=(0.5, 0.005), ncol=1, fontsize=6.3, frameon=False)
-plt.savefig(B + "figure1.png")
-print("saved")
+out = B + "figure1_%s.png" % datetime.now().strftime("%Y%m%d_%H%M%S")
+plt.savefig(out)
+print("saved:", out)
